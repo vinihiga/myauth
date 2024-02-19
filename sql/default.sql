@@ -4,4 +4,6 @@ CREATE TABLE users (
     password varchar(50) NOT NULL
 );
 
-INSERT INTO users (username, password) VALUES ("test", "test");
+DELETE FROM users;
+
+INSERT INTO users (username, password) VALUES ('test', 'test');
