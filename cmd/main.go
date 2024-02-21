@@ -20,6 +20,10 @@ func main() {
 		Provider: dbProvider,
 	}
 
+	var authController controllers.AuthController = controllers.AuthController{
+		Provider: dbProvider,
+	}
+
 	// Creating the server instance and setting-up
 	// the endpoints.
 	// Also we map each endpoint to a controller.
@@ -28,6 +32,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /login", loginController.LoginHandler)
+	mux.HandleFunc("POST /auth", authController.AuthHandler)
 
 	log.Default().Printf("Server starting at %s", addr)
 	log.Fatal(http.ListenAndServe(addr, mux))
