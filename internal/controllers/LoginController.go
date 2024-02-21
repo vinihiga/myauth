@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"myauth/internal/providers"
 	"net/http"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type LoginController struct {
@@ -11,21 +14,28 @@ type LoginController struct {
 }
 
 type userModel struct {
-	id       int
-	username string
-	password string
+	Id       int
+	Username string
+	Password string
 }
 
 func (controller *LoginController) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if controller.Provider == nil {
+		log.Fatal("no provider was found!!!")
+		return
+	}
 
-	log.Default().Printf("Request received!!!\n")
+	log.Default().Printf("request received!!!\n")
+
+	var user userModel = userModel{}
+
+	_ = json.NewDecoder(r.Body).Decode(&user)
 
 	var params map[string]string = map[string]string{}
-	params["username"] = "test"
-	params["password"] = "test"
+	params["username"] = user.Username
+	params["password"] = user.Password
 
 	rows := controller.Provider.Get("users", params)
-	var user userModel = userModel{}
 
 	if !rows.Next() {
 		w.WriteHeader(http.StatusNotFound)
@@ -33,14 +43,27 @@ func (controller *LoginController) LoginHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	scanErr := rows.Scan(&user.id, &user.username, &user.password)
+	// I'm mocking here the private key.
+	// Remember: This is a bad practice, but for testing
+	// and learning purpose, I'm adding here.
+	var rawKey = "test123"
+	var key = []byte(rawKey)
 
-	if scanErr != nil {
+	var token *jwt.Token = jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"foo": "bar",
+		},
+	)
+
+	var result, tokenErr = token.SignedString(key)
+
+	if tokenErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte{})
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte{})
+	w.Write([]byte(result))
 }
