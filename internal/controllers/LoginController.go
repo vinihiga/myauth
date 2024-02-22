@@ -10,7 +10,7 @@ import (
 )
 
 type LoginController struct {
-	Provider   *providers.DatabaseProvider
+	Provider   providers.ProviderInterface
 	PrivateKey []byte
 }
 

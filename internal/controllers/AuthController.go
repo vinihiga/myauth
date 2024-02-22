@@ -13,7 +13,7 @@ import (
 )
 
 type AuthController struct {
-	Provider   *providers.DatabaseProvider
+	Provider   providers.ProviderInterface
 	PrivateKey []byte
 }
 
