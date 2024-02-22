@@ -21,9 +21,9 @@ func InitDatabase() (*DatabaseProvider, error) {
 	return &instance, dbError
 }
 
-func (provider *DatabaseProvider) Get(table string, params map[string]string) *sql.Rows {
+func (provider *DatabaseProvider) Get(entity string, params map[string]string) *sql.Rows {
 
-	var query string = "SELECT * FROM " + table + " WHERE "
+	var query string = "SELECT * FROM " + entity + " WHERE "
 	var args []any = make([]any, 0)
 	var paramNum int = 1
 
@@ -46,6 +46,6 @@ func (provider *DatabaseProvider) Get(table string, params map[string]string) *s
 	return rows
 }
 
-func (provider *DatabaseProvider) Set(table string, params ...any) bool {
+func (provider *DatabaseProvider) Set(entity string, params ...any) bool {
 	return false
 }

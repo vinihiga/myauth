@@ -10,7 +10,8 @@ import (
 )
 
 type LoginController struct {
-	Provider *providers.DatabaseProvider
+	Provider   *providers.DatabaseProvider
+	PrivateKey []byte
 }
 
 type userModel struct {
@@ -19,6 +20,9 @@ type userModel struct {
 	Password string
 }
 
+// LoginHandler handles the login process for the LoginController.
+// It takes in the http.ResponseWriter and http.Request as parameters.
+// It does not return anything.
 func (controller *LoginController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if controller.Provider == nil {
 		log.Fatal("no provider was found!!!")
@@ -46,9 +50,6 @@ func (controller *LoginController) LoginHandler(w http.ResponseWriter, r *http.R
 	// I'm mocking here the private key.
 	// Remember: This is a bad practice, but for testing
 	// and learning purpose, I'm adding here.
-	var rawKey = "test123"
-	var key = []byte(rawKey)
-
 	var token *jwt.Token = jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
@@ -56,7 +57,7 @@ func (controller *LoginController) LoginHandler(w http.ResponseWriter, r *http.R
 		},
 	)
 
-	var result, tokenErr = token.SignedString(key)
+	var result, tokenErr = token.SignedString(controller.PrivateKey)
 
 	if tokenErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)

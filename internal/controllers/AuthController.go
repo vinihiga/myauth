@@ -13,13 +13,17 @@ import (
 )
 
 type AuthController struct {
-	Provider *providers.DatabaseProvider
+	Provider   *providers.DatabaseProvider
+	PrivateKey []byte
 }
 
 type requestBodyMock struct {
 	Foo string
 }
 
+// AuthHandler is a handler for authentication.
+//
+// It takes a http.ResponseWriter and a http.Request as parameters.
 func (controller *AuthController) AuthHandler(w http.ResponseWriter, r *http.Request) {
 	if controller.Provider == nil {
 		log.Fatal("no provider was found!!!")
@@ -37,12 +41,8 @@ func (controller *AuthController) AuthHandler(w http.ResponseWriter, r *http.Req
 
 	var tokenString string = strings.TrimSpace(string(buffer))
 
-	token, parseErr := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		// 	return nil, fmt.Errorf("seems like the signing method is different that HMAC")
-		// }
-
-		return "test123", nil
+	token, parseErr := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		return controller.PrivateKey, nil
 	})
 
 	if parseErr != nil {
@@ -52,12 +52,6 @@ func (controller *AuthController) AuthHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-
-	// if claimErr != nil {
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte{})
-	// 	return
-	// }
 
 	var response requestBodyMock = requestBodyMock{}
 	response.Foo = fmt.Sprint(claims["foo"])
@@ -70,6 +64,7 @@ func (controller *AuthController) AuthHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonContent)
 }
