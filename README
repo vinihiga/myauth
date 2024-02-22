@@ -1,0 +1,20 @@
+# MyAuth - Backend
+**A self-study project to learn Go Lang, Microservices Architecture and Relational Databases.**
+
+The idea of the project is to create a simple service for authenticating users using a combo of "username + password" and returning a valid JWT.
+
+## The Architectural Design
+
+We are using 2 endpoints for checking if the "email + password" is valid and another to check if the received JWT is valid:
+
+*- [POST] /login*
+
+*- [GET] /auth*
+
+## Code Complexity
+
+Oh yes, in this code you are going to see some Big-O notations, because I want to also practice asymptotic analysis.
+
+## Author
+
+Vinícius Hiroshi Higa - @vinihiga
